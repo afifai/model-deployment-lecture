@@ -1,4 +1,5 @@
-gunicorn
-requests==2.25.1
-scikit-learn==0.24.1
-flask==1.1.2
+waitress
+requests
+pandas
+scikit-learn
+flask

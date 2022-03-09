@@ -1,36 +1,41 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 import pickle
+import pandas as pd
 
 app = Flask(__name__)
-with open("pipeline_iris.pkl", "rb") as model_file:
+
+with open("final_pipe.pkl", "rb") as model_file:
     model = pickle.load(model_file)
 
-@app.route("/") # homepage (get)
-def model_prediction():
-    sl = eval(request.args.get('sl'))
-    sw = eval(request.args.get('sw'))
-    pl = eval(request.args.get('pl'))
-    pw = eval(request.args.get('pw'))
-    new_data = [sl, sw, pl, pw]
-    res = model.predict([new_data])
-    classes = ['setosa', 'versicolor', 'virginica']
-    response = {'status':'success',
-            'code':200,
-            'data':{'result':classes[res[0]]}
-            }
-    return jsonify(response)
+columns=['Pclass', 'Sex', 'Age', 'SibSp', 'Parch']
+classes = ['Not Survived', 'Survived']
 
-@app.route("/predict", methods=['POST'])
-def prediction_post():
-    content = request.json
-    data = [content['sl'],
-            content['sw'],
-            content['pl'],
-            content['pw']]
-    res = model.predict([data])
-    classes = ['setosa', 'versicolor', 'virginica']
-    response = {'status':'success',
-            'code':200,
-            'data':{'result':classes[res[0]]}
-            }
-    return jsonify(response)
+
+@app.route("/") # home page
+def hello_world():
+    return "<h1>It Works</h1>"
+
+@app.route("/predict", methods=['GET', 'POST'])
+def model_prediction():
+    if request.method == "POST":
+        content = request.json
+        
+        try:
+            data = [content['passenger_class'],
+                    content['gender'],
+                    content['age'],
+                    content['siblingspouse'],
+                    content['parentchildren']]
+            data = pd.DataFrame([data], columns=columns)
+            res = model.predict(data)
+            response = {'code':200,
+                        'status':"OK",
+                        'data':{'result':{'target':str(res[0]),
+                                        'target_names':classes[res[0]]}}}
+            return jsonify(response)
+        except Exception as e:
+            response = {'code':500,
+                        'status':"error",
+                        'summary': str(e)}
+            return jsonify(response)
+    return "Silahkan gunakan method post untuk mengakses hasil prediksi dari model"

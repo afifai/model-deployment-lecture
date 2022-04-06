@@ -1,5 +1,4 @@
 waitress
-requests
 pandas
 scikit-learn
 flask

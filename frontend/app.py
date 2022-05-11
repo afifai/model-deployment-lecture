@@ -13,17 +13,14 @@ sex = st.selectbox("Gender", ['male', 'female'])
 data = {'passenger_class':pclass,
         'fare':fare,
         'age': age,
-        'siblingspouse':sibsp,
-        'parentchildren':parch,
+        'sibling_spouse':sibsp,
+        'parent_children':parch,
         'gender':sex}
 
-URL = "https://model-deployment9-backend.herokuapp.com/predict"
+URL = "https://h8-model-deployment-backend.herokuapp.com/titanic"
 
 # komunikasi
 r = requests.post(URL, json=data)
 res = r.json()
 if res['code'] == 200:
-    st.title(res['result']['description'])
-else:
-    st.write("Mohon maaf terjadi kesalahan")
-    st.write(f"keterangan : {res['result']['error_msg']}")
+    st.title(res['result']['classes'])

@@ -1,51 +1,41 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 import pickle
 import pandas as pd
 
 app = Flask(__name__)
 
-IRIS_CLASSES = ['setosa', 'versicolor', 'virginica']
-with open("iris_pipe.pkl", "rb") as f:
-    model_iris = pickle.load(f)
-
-LABEL = ['Not Survived', 'Survived']
-columns = ['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare']
-with open("titanic_pipe.pkl", "rb") as f:
-    model_titanic = pickle.load(f)
+# initiate model & columns
+LABEL = ["Not Survived", "Survived"]
+with open("final_pipe.pkl", "rb") as f:
+    model = pickle.load(f)
 
 @app.route("/")
-def homepage():
-    return "<h1>Backend Pemodelan Iris & Titanic </h1>"
+def welcome():
+    return "<h3>Selamat Datang di Program Backend Model Saya</h3>"
 
-@app.route("/iris", methods=['GET', 'POST'])
-def iris_inference():
-    if request.method == 'POST':
-        data = request.json
-        new_data = [data['sl'], data['sw'], data['pl'], data['pw']]
-        res = model_iris.predict([new_data])
+@app.route("/predict", methods=["GET", "POST"])
+def predict_titanic():
+    if request.method == "POST":
+        content = request.json
+        try:
+            new_data = {'Pclass': content['passenger_class'],
+                        'Sex': content['gender'],
+                        'Age' : content['age'],
+                        'SibSp' : content['sibling_spouse'],
+                        'Parch' : content['parent_children'],
+                        'Fare' : content['fare']}
+            new_data = pd.DataFrame([new_data])
+            res = model.predict(new_data)
+            result = {'class':str(res[0]),
+                      'class_name':LABEL[res[0]]}
+            response = jsonify(success=True,
+                               result=result)
+            return response, 200
+        except Exception as e:
+            response = jsonify(success=False,
+                               message=str(e))
+            return response, 400
+    # return dari method get
+    return "<p>Silahkan gunakan method POST untuk mode <em>inference model</em></p>"
 
-        response = {'code':200, 'status':'OK',
-                    'result':{'prediction': str(res[0]),
-                              'classes': IRIS_CLASSES[res[0]]}}
-        
-        return jsonify(response)
-    return "Silahkan gunakan method post untuk mengakses model iris"
-
-
-@app.route("/titanic", methods=["GET", "POST"])
-def titanic_inference():
-    if request.method == 'POST':
-        data = request.json
-        new_data = [data['passenger_class'],
-                    data['gender'],
-                    data['age'],
-                    data['sibling_spouse'],
-                    data['parent_children'],
-                    data['fare']]
-        new_data = pd.DataFrame([new_data], columns=columns)
-        res = model_titanic.predict(new_data)
-        response = {'code':200, 'status':'OK',
-                    'result':{'prediction': str(res[0]),
-                              'classes': LABEL[res[0]]}}
-        return jsonify(response)
-    return "Silahkan gunakan method post untuk mengakses model titanic"
+# app.run(debug=True)

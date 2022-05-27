@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 
-
 st.title("Aplikasi Pengecekan Penumpang Titanic")
 pclass = st.selectbox("Passenger Class", [1, 2, 3])
 fare = st.number_input("Fare")
@@ -17,10 +16,14 @@ data = {'passenger_class':pclass,
         'parent_children':parch,
         'gender':sex}
 
-URL = "https://h8-model-deployment-backend.herokuapp.com/titanic"
+# URL = "http://127.0.0.1:5000/predict" # sebelum push backend
+URL = "https://afif-deployment-backend.herokuapp.com/predict" # setelah push backend
 
 # komunikasi
 r = requests.post(URL, json=data)
 res = r.json()
-if res['code'] == 200:
-    st.title(res['result']['classes'])
+if r.status_code == 200:
+    st.title(res['result']['class_name'])
+elif r.status_code == 400:
+    st.title("ERROR BOSS")
+    st.write(res['message'])

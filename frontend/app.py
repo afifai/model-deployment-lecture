@@ -16,14 +16,14 @@ data = {'passenger_class':pclass,
         'parent_children':parch,
         'gender':sex}
 
-# URL = "http://127.0.0.1:5000/predict" # sebelum push backend
-URL = "https://afif-deployment-backend.herokuapp.com/predict" # setelah push backend
+# URL = "http://127.0.0.1:5000/titanic_prediction" # sebelum push backend
+URL = "https://model-deployment-backend.herokuapp.com/titanic_prediction" # URL Heroku
 
 # komunikasi
 r = requests.post(URL, json=data)
 res = r.json()
 if r.status_code == 200:
-    st.title(res['result']['class_name'])
-elif r.status_code == 400:
+    st.title(res['result']['label_name'])
+else:
     st.title("ERROR BOSS")
     st.write(res['message'])

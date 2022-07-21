@@ -24,7 +24,7 @@ python app.py
 selanjutnya masuk ke folder `frontend/` lalu jalankan
 
 ```
-streamlit run frontend.py
+streamlit run app.py
 ```
 
 kode pada repository ini sudah siap dideploy ke heroku

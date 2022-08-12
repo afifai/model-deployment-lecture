@@ -1,0 +1,8 @@
+Deploy Heroku : 
+heroku create nama-app
+
+heroku container:login
+
+heroku container:push web -a nama-app
+
+heroku container:release web -a nama-app

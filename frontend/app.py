@@ -10,7 +10,7 @@ parch = st.number_input("Parent Children")
 gender = st.selectbox("Gender", ["male", "female"])
 
 # inference
-URL = "https://model-deployment-lecture.herokuapp.com/titanic"
+URL = "https://backend-model-deployment.herokuapp.com/predict/titanic"
 param = {'passenger_class': pclass,
          'gender': gender,
          'age' : age,
